@@ -6,6 +6,7 @@ const OPERATIONS = {
 }
 
 /**
+ * @throws {SyntaxError}
  * @param {string} input 
  * @returns {number} total result
  */
