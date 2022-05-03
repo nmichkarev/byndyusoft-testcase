@@ -2,28 +2,29 @@ const assert = require('assert');
 
 const {
     calculate,
-    iteration,
+    doOperation,
     solveFlatExpression,
     parse,
     getNextOperationIndex
-} = require('./functions');
+} = require('./calculate-module');
 
 suite('Tests set', function() {
+
     suite('Inner functions tests', function() {
-        test('iteration function', function() {
+        test('doOperation function', function() {
             // 1 + 3 * 4 - 2 * 6
             const exprArr = [1, 3, 4, 2, 6];
             const opsArr  = ['+', '*', '-', '*'];
-            const [exprArr1, opsArr1] = iteration(exprArr, opsArr, 1);
+            const [exprArr1, opsArr1] = doOperation(exprArr, opsArr, 1);
             assert.deepEqual(exprArr1, [1, 12, 2, 6], 'step 1');
             assert.deepEqual(opsArr1, ['+', '-', '*'], 'step 1');
-            const [exprArr2, opsArr2] = iteration(exprArr1, opsArr1, 2);
+            const [exprArr2, opsArr2] = doOperation(exprArr1, opsArr1, 2);
             assert.deepEqual(exprArr2, [1, 12, 12], 'step 2');
             assert.deepEqual(opsArr2, ['+', '-'], 'step 2');
-            const [exprArr3, opsArr3] = iteration(exprArr2, opsArr2, 0);
+            const [exprArr3, opsArr3] = doOperation(exprArr2, opsArr2, 0);
             assert.deepEqual(exprArr3, [13, 12], 'step 3');
             assert.deepEqual(opsArr3, ['-'], 'step 3');
-            const [exprArr4, opsArr4] = iteration(exprArr3, opsArr3, 0);
+            const [exprArr4, opsArr4] = doOperation(exprArr3, opsArr3, 0);
             assert.deepEqual(exprArr4, [1], 'step 4');
             assert.deepEqual(opsArr4, [], 'step 4');
         });

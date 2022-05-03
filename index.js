@@ -1,4 +1,4 @@
-const { calculate } = require('./functions');
+const { calculate } = require('./calculate-module');
 
 process.stdin.setEncoding('utf8');
 

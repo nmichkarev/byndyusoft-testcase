@@ -6,6 +6,7 @@ const OPERATIONS = {
 }
 
 /**
+ * Main function
  * @throws {SyntaxError}
  * @param {string} input 
  * @returns {number} total result
@@ -22,30 +23,28 @@ function calculate(input = '') {
  * @returns {[[number], [string]]} ex: [[1, 2, 3, 4], ['+', '-', '*']]
  */
  function parse(input) {
-    const operands   = [];
-    const operations = [];
-    let numStart = null, 
-        lastOperation = null, 
-        gotParenthesis = false, 
+    const operands     = [];
+    const operations   = [];
+    let numStartIndex  = null,
+        lastOperation  = null, 
+        gotParentheses = false, 
         i = 0;
 
     input = input.replace(/\s/g, '');
 
     while(i < input.length) {
 
-        const char = input[i];
-        const isOper = char in OPERATIONS;
-        const isDigit = /\d|\./.test(char);
-
+        const char         = input[i];
+        const isOperation  = char in OPERATIONS;
+        const isDigit      = /\d|\./.test(char);
         const errorMessage = `Syntax error near "${char}"`;
         
-        if (!isOper) lastOperation = null;
 
         // met ) before (
         if (char === ')') throw new SyntaxError(errorMessage);
 
         if (char === '(') {
-            const closingPar = findClosingParent(input, i);
+            const closingPar = findClosingParenthese(input, i);
 
             // "(" without ")"
             if (!closingPar) throw new SyntaxError(errorMessage);
@@ -53,38 +52,41 @@ function calculate(input = '') {
             operands.push(
                 calculate(input.slice(i + 1, closingPar))
             );
-            i = closingPar + 1; // jump to the end of parentheses
-            gotParenthesis = true;
 
+            i = closingPar + 1; // jump to the end of parentheses
+            gotParentheses = true;
             continue;
         }
+        if (!isOperation) lastOperation = null;
 
         // incorrect symbol
-        if (!isOper && !isDigit) throw new SyntaxError(errorMessage);
+        if (!isOperation && !isDigit) throw new SyntaxError(errorMessage);
 
         // two operations in a row
-        if (isOper && lastOperation !== null) throw new SyntaxError(errorMessage);
+        if (isOperation && lastOperation !== null) 
+            throw new SyntaxError(errorMessage);
 
         if (isDigit || (i === 0 && char === '-')) {
-            if (numStart === null) numStart = i;
+            if (numStartIndex === null) numStartIndex = i;
             if (i === input.length - 1) {
-                cutNumToArray(input, numStart, undefined, operands, char);            
+                extractNumber(input, numStartIndex, undefined, operands, char);            
             }
         } else {
             // operation symbol without number or parenthesis group before it
-            if (numStart === null && !gotParenthesis)
+            if (numStartIndex === null && !gotParentheses)
                 throw new SyntaxError(errorMessage);
 
             lastOperation = char;
-            if (!gotParenthesis) {
-                cutNumToArray(input, numStart, i, operands, char);
+            
+            if (!gotParentheses) {
+                extractNumber(input, numStartIndex, i, operands, char);
             }
 
             operations.push(char);
-            numStart = null;
+            numStartIndex = null;
         }
 
-        gotParenthesis = false;
+        gotParentheses = false;
         i++;
     }
 
@@ -100,7 +102,7 @@ function solveFlatExpression(operands, operations) {
     let len = operations.length;
     while(len > 0) {
         const nextOperationIndex = getNextOperationIndex(operations);
-        [operands, operations] = iteration(operands, operations, nextOperationIndex);
+        [operands, operations] = doOperation(operands, operations, nextOperationIndex);
         len = operations.length;
     }
     return operands[0] || 0;
@@ -131,7 +133,7 @@ function getNextOperationIndex(operations) {
  * @returns {[[number], [string]]} resulting operands and operations arrays after
  * single calculation
  */
-function iteration(operands, operations, nextIndex) {
+function doOperation(operands, operations, nextIndex) {
     const newValue = OPERATIONS[operations[nextIndex]]
         .func(operands[nextIndex], operands[nextIndex + 1]);
 
@@ -144,7 +146,7 @@ function iteration(operands, operations, nextIndex) {
     return [newOperands, newOperations];
 }
 
-function findClosingParent(str, openIndex) {
+function findClosingParenthese(str, openIndex) {
     let open = 1;
     for (let i = openIndex + 1; i < str.length; i++) {
         if (str[i] === '(')
@@ -158,7 +160,7 @@ function findClosingParent(str, openIndex) {
 /**
  * @throws {SyntaxError} throws if given number substring cannot be casted to number  
  */
-function cutNumToArray(input, from, to, arr, char) {
+function extractNumber(input, from, to, arr, char) {
     const parsedNum = Number(input.slice(from, to));
 
     if (isNaN(parsedNum))
@@ -169,7 +171,7 @@ function cutNumToArray(input, from, to, arr, char) {
 
 module.exports = {
     calculate,
-    iteration,
+    doOperation,
     solveFlatExpression,
     parse,
     getNextOperationIndex
