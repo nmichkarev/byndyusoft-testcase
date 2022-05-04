@@ -2,8 +2,7 @@ const OPERATIONS = {
     '+': { priority: 1, func: (a, b) => a + b },
     '-': { priority: 1, func: (a, b) => a - b },
     '*': { priority: 2, func: (a, b) => a * b },
-    '/': { priority: 2, func: (a, b) => a / b },
-    '^': {priority: 2, func: (a, b) => a % b}
+    '/': { priority: 2, func: (a, b) => a / b }
 
 }
 
