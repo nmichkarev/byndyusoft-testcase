@@ -9,7 +9,6 @@ const {
 } = require('./calculate-module');
 
 suite('Tests set', function() {
-
     suite('Inner functions tests', function() {
         test('doOperation function', function() {
             // 1 + 3 * 4 - 2 * 6
@@ -74,7 +73,10 @@ suite('Tests set', function() {
             assert.equal(calculate('1 + ((5 + 1) * (3 - 1))'), 13);
             assert.equal(calculate('1'), 1);
             assert.equal(calculate('-1'), -1);
-            assert.equal(calculate('5 * (-2)'), -10)
+            assert.equal(calculate('5 * (-2)'), -10);
+            assert.equal(calculate('2(3+4)'), 14);
+            assert.equal(calculate('(3+4)2'), 14);
+            assert.equal(calculate('(3+2)(2+1)'), 15);
         })
 
         test('Incorrect data', function() {
